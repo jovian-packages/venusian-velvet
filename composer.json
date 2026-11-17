@@ -1,0 +1,69 @@
+{
+    "name": "jovian/venusian-velvet",
+    "description": "Lustrous, Velvet's renderer for Venusian Topside: framebuffers, rasterizers, painters, strokers, raycasters, glyphs and typography drivers, in PHP and in C through the house extensions.",
+    "type": "library",
+    "keywords": [
+        "framework",
+        "venusian",
+        "topside",
+        "velvet",
+        "lustrous",
+        "rendering",
+        "typography"
+    ],
+    "license": "MIT",
+    "homepage": "https://venusian.projectsaturnstudios.com/ecosystem/jovian/venusian-velvet/0.11.x",
+    "support": {
+        "issues": "https://github.com/jovian-packages/venusian-velvet/issues",
+        "source": "https://github.com/jovian-packages/venusian-velvet"
+    },
+    "authors": [
+        {
+            "name": "Angel Gonzalez",
+            "email": "angel@projectsaturnstudios.com"
+        }
+    ],
+    "require": {
+        "php": "~8.4.27||^8.5.12",
+        "venusian/topside": "^0.11.5"
+    },
+    "require-dev": {
+        "pestphp/pest": "^4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jovian\\Engines\\Velvet\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jovian\\Engines\\Velvet\\Tests\\": "tests/",
+            "Venusian\\Topside\\Tests\\": "../../venusian/topside/tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.11.x-dev"
+        },
+        "venusian": {
+            "providers": [
+                "Jovian\\Engines\\Velvet\\Providers\\VenusianVelvetServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "suggest": {
+        "ext-fb": "lustrous-c framebuffers",
+        "ext-rasterize": "lustrous-c rasterizers, strokers and glyphs",
+        "ext-paint": "lustrous-c painters",
+        "ext-raycast": "lustrous-c raycasters",
+        "ext-typog": "lustrous-c font catalog, faces and shaper"
+    }
+}

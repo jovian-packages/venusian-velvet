@@ -1,0 +1,56 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.4, 8.5]
+        lustrous: [php, c]
+
+    name: PHP ${{ matrix.php }}, lustrous-${{ matrix.lustrous }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          tools: composer
+          coverage: none
+
+      # lustrous-c: every C driver, so each behaviour runs against both drivers. lustrous-php: none.
+      - name: Build Lustrous's extensions
+        if: matrix.lustrous == 'c'
+        run: |
+          scan="$(php -r 'echo PHP_CONFIG_FILE_SCAN_DIR;')"
+          for ext in fb rasterize paint raycast typog; do
+            git clone --depth 1 --branch 0.11.x "https://github.com/php-io-extensions/$ext.git" "../ext-$ext"
+            (cd "../ext-$ext" && phpize && ./configure "--enable-$ext" && make -j"$(nproc)")
+            echo "extension=$(realpath ../ext-$ext)/modules/$ext.so" | sudo tee "$scan/99-$ext.ini"
+            php --ri "$ext"
+          done
+
+      # The suite loads topside's test fixtures from ../../venusian/topside.
+      - name: Checkout venusian/topside
+        run: git clone --depth 1 --branch 0.11.x https://github.com/VenusianPHP/topside.git ../../venusian/topside
+
+      - name: Resolve venusian/topside from the checkout
+        run: |
+          composer config repositories.topside '{"type": "path", "url": "../../venusian/topside", "options": {"symlink": false}}'
+
+      - name: Install Composer dependencies
+        run: composer update --prefer-stable --no-interaction --no-progress
+
+      - name: Execute tests
+        run: php -d memory_limit=512M vendor/bin/pest
